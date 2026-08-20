@@ -25,6 +25,7 @@ async def lifespan(_: FastAPI):
     get_container()
     yield
     logger.info("Application shutdown")
+    #你好
     #await close_redis()
     #await close_milvus()
     #await close_http_client()
