@@ -13,6 +13,7 @@ class SQLiteKnowledgeRepository:
         self.database_path = database_path
         self.database_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # 创建数据库连接
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.database_path)
         connection.row_factory = sqlite3.Row
@@ -22,6 +23,7 @@ class SQLiteKnowledgeRepository:
     def initialize(self) -> None:
         # 使用 FTS5 保存检索字段，避免 MVP 阶段先引入独立搜索服务。
         with self._connect() as connection:
+            # chunks_fts全文索引表
             connection.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS documents (
@@ -59,6 +61,7 @@ class SQLiteKnowledgeRepository:
     def list_documents(self) -> list[Document]:
         with self._connect() as connection:
             rows = connection.execute("SELECT * FROM documents ORDER BY created_at DESC").fetchall()
+        # 返回列表
         return [self._to_document(row) for row in rows]
 
     def get_document(self, document_id: str) -> Document | None:
@@ -89,9 +92,11 @@ class SQLiteKnowledgeRepository:
             WHERE chunks_fts MATCH ?
         """
         params: list[object] = [expression]
+        # 领域过滤
         if domain:
             sql += " AND d.domain = ?"
             params.append(domain)
+        # 召回，rank越小越好
         sql += " ORDER BY rank LIMIT ?"
         params.append(top_k)
         with self._connect() as connection:

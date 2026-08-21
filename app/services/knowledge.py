@@ -63,5 +63,11 @@ class KnowledgeService:
 
     @staticmethod
     def _response(document: Document) -> DocumentResponse:
-          return  DocumentResponse(id=document.id, filename=document.filename, domian=document.domain, 
-                                   statuc=document.status, chunk_count=document.chunk_count, created_at=document.created_at)
+          return DocumentResponse(
+              id=document.id,
+              filename=document.filename,
+              domain=document.domain,
+              status=document.status,
+              chunk_count=document.chunk_count,
+              created_at=document.created_at,
+          )
